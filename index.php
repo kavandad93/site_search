@@ -3,13 +3,16 @@
 $blacklist = [];
 
 if (file_exists("black_list.json")) {
-    $blacklist = json_decode(file_get_contents("black_list.json"), true) ?: [];
+    $blacklist = json_decode(file_get_contents("black_list.json"), true);
+
+    if (!is_array($blacklist)) {
+        $blacklist = [];
+    }
 }
 
 $folders = [];
 
 foreach (scandir(__DIR__) as $item) {
-
     if ($item === "." || $item === "..") continue;
     if (!is_dir(__DIR__ . "/" . $item)) continue;
     if (in_array($item, $blacklist)) continue;
@@ -17,7 +20,9 @@ foreach (scandir(__DIR__) as $item) {
     $folders[] = $item;
 }
 
+sort($folders, SORT_NATURAL | SORT_FLAG_CASE);
 ?>
+
 <!DOCTYPE html>
 <html dir="rtl">
 <head>
@@ -29,6 +34,8 @@ body{
     max-width:800px;
     margin:auto;
     padding:20px;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    min-height:100vh;
 }
 input{
     width:100%;
@@ -37,30 +44,39 @@ input{
     box-sizing:border-box;
 }
 a{
-    display:block;
-    padding:10px;
-    margin:5px 0;
-    text-decoration:none;
-    border:1px solid #ddd;
-    border-radius:8px;
-    color:#000;
+    transition:.2s;
 }
+
 a:hover{
-    background:#f5f5f5;
+    transform:translateY(-2px);
+}
+.har{
+    color: #1f2937;
+    text-shadow: 20px 10px 8px rgba(0, 0, 0, 0.67);
+
+}
+.ser{
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border: 4px solid rgba(255, 255, 255, 0.72);
+    border-radius: 16px;
+    
 }
 </style>
 </head>
 <body>
 
-<h2>📁 فایل‌ها</h2>
+<h2 class="har">📁 فایل‌ها</h2>
 
-<input type="text" id="search" placeholder="جستجو...">
+<input class="ser" type="text" id="search" placeholder="جستجو...">
 
 <div id="folders">
 
 <?php
+
 foreach($folders as $folder){
-    echo '<a href="'.htmlspecialchars($folder).'/">📁 '.htmlspecialchars($folder).'</a>';
+    echo '<a class="ser" href="'.htmlspecialchars($folder).'/">📁 '.htmlspecialchars($folder).'</a>';
 }
 ?>
 
@@ -83,3 +99,4 @@ search.addEventListener("input", () => {
 
 </body>
 </html>
+
